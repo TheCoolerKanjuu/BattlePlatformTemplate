@@ -24,27 +24,27 @@ namespace Application.BP.Bases.Crud;
         /// </summary>
         /// <param name="logger">logger instance.</param>
         /// <param name="domainService">The instance of a <see cref="CrudDomainService{TEntity,TDto,TMapper}"/>.</param>
-        public CrudAppService(ILogger<AppService> logger, ICrudDomainService<TEntity, TDto, TMapper> domainService) : base(logger)
+        public CrudAppService(ILogger<CrudAppService<TEntity, TDto, TMapper>> logger, ICrudDomainService<TEntity, TDto, TMapper> domainService) : base(logger)
         {
             this._domainService = domainService;
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<TDto>> GetAsync(Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, string includeProperties = "")
+        public IEnumerable<TDto> Get(Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, string includeProperties = "")
         {
-            return await this._domainService.GetAsync(filter, orderBy, includeProperties);
+            return this._domainService.Get(filter, orderBy, includeProperties);
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<TDto>> GetAllAsync()
+        public IEnumerable<TDto> GetAll()
         {
-            return await this._domainService.GetAllAsync();
+            return this._domainService.GetAll();
         }
 
         /// <inheritdoc/>
-        public async Task<TDto?> GetByIdAsync(int id)
+        public TDto GetById(int id)
         {
-            return await this._domainService.GetByIdAsync(id);
+            return this._domainService.GetById(id);
         }
 
         /// <inheritdoc/>

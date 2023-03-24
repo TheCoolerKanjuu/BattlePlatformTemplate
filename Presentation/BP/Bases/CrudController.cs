@@ -29,7 +29,7 @@ namespace Presentation.BP.Bases;
         /// </summary>
         /// <param name="logger">The logger instance.</param>
         /// <param name="crudAppService">The crud service instance.</param>
-        protected CrudController(ILogger<BaseController> logger, ICrudAppService<TEntity, TDto, TMapper> crudAppService) : base(logger)
+        protected CrudController(ILogger<CrudController<TEntity, TDto, TMapper>> logger, ICrudAppService<TEntity, TDto, TMapper> crudAppService) : base(logger)
         {
             this._crudAppService = crudAppService;
         }
@@ -40,9 +40,9 @@ namespace Presentation.BP.Bases;
         /// <returns>All entities as <see cref="TDto"/>.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public virtual async Task<IActionResult> GetAll()
+        public virtual IActionResult GetAll()
         {
-            return this.Ok(await this._crudAppService.GetAllAsync());
+            return this.Ok(this._crudAppService.GetAll());
         }
         
         /// <summary>
@@ -55,11 +55,11 @@ namespace Presentation.BP.Bases;
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-        public virtual async Task<IActionResult> GetById(int id)
+        public virtual IActionResult GetById(int id)
         {
             try
             {
-                return this.Ok(await this._crudAppService.GetByIdAsync(id));
+                return this.Ok(this._crudAppService.GetById(id));
             }
             catch (EntityNotFoundException e)
             {

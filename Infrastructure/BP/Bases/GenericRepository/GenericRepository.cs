@@ -6,7 +6,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.BP.Bases.GenericRepository;
 
-    /// <inheritdoc/>
+using Migrations;
+
+/// <inheritdoc/>
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity
     {
         /// <summary>
@@ -17,21 +19,27 @@ namespace Infrastructure.BP.Bases.GenericRepository;
         /// <summary>
         /// Logger instance.
         /// </summary>
-        private readonly ILogger _logger;
+        private readonly ILogger<IGenericRepository<TEntity>> _logger;
+
+        /// <summary>
+        /// Context class instance.
+        /// </summary>
+        private readonly DataContext _context;
 
         /// <summary>
         /// Create the instance of the repository for <see cref="TEntity"/>.
         /// </summary>
         /// <param name="context">The context of the Db.</param>
         /// <param name="logger">logger instance.</param>
-        public GenericRepository(DbContext context, ILogger logger)
+        public GenericRepository(DataContext context, ILogger<GenericRepository<TEntity>> logger)
         {
             this._dbSet = context.Set<TEntity>();
             this._logger = logger;
+            this._context = context;
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<TEntity>> GetAsync(
+        public IEnumerable<TEntity> Get(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "")
@@ -39,22 +47,13 @@ namespace Infrastructure.BP.Bases.GenericRepository;
             IQueryable<TEntity> query = this._dbSet;
 
             if (filter != null)
-            {
                 query = query.Where(filter);
-            }
 
-            query = includeProperties.Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries).Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
-
-            var result = orderBy != null ? orderBy(query).ToList() : query.ToList();
-            var count = result.Count;
-
-            // Log the number of entities found
-            this._logger.LogInformation("Fetched {Count} {TEntity} at {DT}.", count, typeof(TEntity), DateTime.UtcNow.ToLongTimeString());
-
-            return await Task.FromResult(result);
+            query = includeProperties.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries).Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+            return orderBy != null ? orderBy(query).ToList() : query.ToList();
         }
         /// <inheritdoc/>
-        public async Task<IEnumerable<TEntity>> GetAsNoTrackingAsync(
+        public IEnumerable<TEntity> GetAsNoTracking(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "")
@@ -62,28 +61,19 @@ namespace Infrastructure.BP.Bases.GenericRepository;
             IQueryable<TEntity> query = this._dbSet;
 
             if (filter != null)
-            {
                 query = query.Where(filter).AsNoTracking();
-            }
 
-            query = includeProperties.Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries).Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
-
-            var result = orderBy != null ? orderBy(query).ToList() : query.ToList();
-            var count = result.Count;
-
-            // Log the number of entities found
-            this._logger.LogInformation("Fetched {Count} {TEntity} at {DT}.", count, typeof(TEntity), DateTime.UtcNow.ToLongTimeString());
-
-            return await Task.FromResult(result);
+            query = includeProperties.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries).Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+            return orderBy != null ? orderBy(query).ToList() : query.ToList();
         }
 
         /// <inheritdoc/>
-        public async Task<TEntity> GetByIdAsync(int id)
+        public TEntity GetById(int id)
         {
-            var entity = await this._dbSet.FindAsync(id);
+            var entity = this._dbSet.Find(id);
             if (entity != null)
             {
-                this._logger.LogInformation("Fetched {TEntity} of id {Id} at {DT}.", typeof(TEntity), id, DateTime.UtcNow.ToLongTimeString());
+                this._logger.LogInformation("Fetched {TEntity} of id {Id} at {DT}", typeof(TEntity), id, DateTime.UtcNow.ToLongTimeString());
                 return entity;
             }
 
@@ -94,8 +84,8 @@ namespace Infrastructure.BP.Bases.GenericRepository;
         /// <inheritdoc/>
         public void Insert(TEntity entity)
         {
-            this._logger.LogInformation("{TEntity} of id {Id} to be inserted at {DT}.", typeof(TEntity), entity.Id, DateTime.UtcNow.ToLongTimeString());
-            this._dbSet.Entry(entity).State = EntityState.Added;
+            this._logger.LogInformation("{TEntity} of id {Id} to be inserted at {DT}", typeof(TEntity), entity.Id, DateTime.UtcNow.ToLongTimeString());
+            this._dbSet.Add(entity);
         }
 
         /// <inheritdoc/>
@@ -109,7 +99,7 @@ namespace Infrastructure.BP.Bases.GenericRepository;
             }
             else
             {
-                this._logger.LogWarning("Won't delete entity of type {TEntity} because it doesn't exist in database.", typeof(TEntity));
+                this._logger.LogWarning("Won't delete entity of type {TEntity} because it doesn't exist in database", typeof(TEntity));
                 throw new EntityNotFoundException($"No {typeof(TEntity)} of Id {id} found.");
             }
         }
@@ -123,21 +113,22 @@ namespace Infrastructure.BP.Bases.GenericRepository;
             }
 
             this._dbSet.Remove(entityToDelete);
-            this._logger.LogInformation(" {TEntity} Id: {Id} to be deleted.", typeof(TEntity), entityToDelete.Id);
+            this._logger.LogInformation(" {TEntity} Id: {Id} to be deleted", typeof(TEntity), entityToDelete.Id);
         }
 
         /// <inheritdoc/>
         public void Update(TEntity entityToUpdate)
         {
-            // Check if the entity exists in the database
             var existingEntity = this._dbSet.Find(entityToUpdate.Id);
+            
             if (existingEntity == null)
             {
                 throw new EntityNotFoundException($"No {typeof(TEntity)} of Id {entityToUpdate.Id} found.");
             }
 
-            // Update the entity
-            this._dbSet.Entry(existingEntity).CurrentValues.SetValues(entityToUpdate);
-            this._logger.LogInformation("{TEntity} Id: {Id} updated.", typeof(TEntity), entityToUpdate.Id);
+            this._dbSet.Attach(entityToUpdate);
+            this._context.Entry(entityToUpdate).State = EntityState.Modified;
+            
+            this._logger.LogInformation("{TEntity} Id: {Id} to be updated", typeof(TEntity), entityToUpdate.Id);
         }
     }

@@ -28,7 +28,7 @@ namespace Domain.BP.Bases.Crud;
         /// <param name="orderBy">Linq function that expresses an order, applied to the return of the request.</param>
         /// <param name="includeProperties">string containing all properties.</param>
         /// <returns>A <see cref="IEnumerable{TDTO}"/>.</returns>
-        public Task<IEnumerable<TDto>> GetAsync(
+        public IEnumerable<TDto> Get(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "");
@@ -41,7 +41,7 @@ namespace Domain.BP.Bases.Crud;
         /// <param name="orderBy">Linq function that expresses an order, applied to the return of the request.</param>
         /// <param name="includeProperties">string containing all properties.</param>
         /// <returns>A <see cref="IEnumerable{TDTO}"/>.</returns>
-        public Task<IEnumerable<TDto>> GetAsNoTrackingAsync(
+        public IEnumerable<TDto> GetAsNoTracking(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "");
@@ -50,14 +50,14 @@ namespace Domain.BP.Bases.Crud;
         /// Fetch all <see cref="TEntity"/> then map and return them as <see cref="TDto"/>
         /// </summary>
         /// <returns>A List of <see cref="TDto"/>.</returns>
-        public Task<IEnumerable<TDto>> GetAllAsync();
+        public IEnumerable<TDto> GetAll();
 
         /// <summary>
         /// Fetch a <see cref="TEntity"/> then map and return it as <see cref="TDto"/>
         /// </summary>
         /// <param name="id">The Id of the <see cref="TDto"/> to fetch.</param>
         /// <returns>A <see cref="TDto"/></returns>
-        public Task<TDto?> GetByIdAsync(int id);
+        public TDto GetById(int id);
 
         /// <summary>
         /// Map a <see cref="TDto"/> into a <see cref="TEntity"/> and insert it into the localdb.
