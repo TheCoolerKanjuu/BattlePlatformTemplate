@@ -1,3 +1,5 @@
+using Infrastructure.Migrations;
+using Microsoft.EntityFrameworkCore;
 using Presentation;
 using Presentation.BP.Helpers;
 
@@ -10,10 +12,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDependencyGroup(EnvFinder.GetEnvironment(builder.Environment));
+builder.Services.AddDbContext<DataContext>(option =>
+    option.UseSqlServer(builder.Configuration.GetConnectionString("Context")));
+
+builder.Services.AddDependencyGroup(EnvFinder.GetEnvironment(builder.Environment), builder.Configuration);
 
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

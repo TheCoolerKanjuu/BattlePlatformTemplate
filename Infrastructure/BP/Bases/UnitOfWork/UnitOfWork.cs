@@ -5,13 +5,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.BP.Bases.UnitOfWork;
 
-   /// <inheritdoc/>
+using Migrations;
+
+/// <inheritdoc/>
     public sealed class UnitOfWork : IUnitOfWork
     {
         /// <summary>
         /// The context of the db.
         /// </summary>
-        private readonly DbContext _context;
+        private readonly DataContext _context;
 
         /// <summary>
         /// The dictionary that contains all instances of the repositories.
@@ -36,7 +38,7 @@ namespace Infrastructure.BP.Bases.UnitOfWork;
         /// <param name="context">The context of the db.</param>
         /// <param name="logger">Logger instance.</param>
         public UnitOfWork(
-            DbContext context, ILogger<UnitOfWork> logger)
+            DataContext context, ILogger<UnitOfWork> logger)
         {
             this._logger = logger;
             this._context = context;

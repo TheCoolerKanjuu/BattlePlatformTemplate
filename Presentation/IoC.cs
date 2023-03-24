@@ -4,9 +4,9 @@ namespace Presentation;
 
 public static class Ioc
 {
-    public static void AddDependencyGroup(this IServiceCollection services, Environment environment)
+    public static void AddDependencyGroup(this IServiceCollection services, Environment environment, IConfiguration configuration)
     {
-        BP.Ioc.AddDependencyGroup(services, environment);
+        BP.Ioc.AddDependencyGroup(services, environment, configuration);
         AddDomainServices(services, environment);
         AddApplicationServices(services, environment);
     }
