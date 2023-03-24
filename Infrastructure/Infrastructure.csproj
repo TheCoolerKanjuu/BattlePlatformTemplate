@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="BF" />
+      <Folder Include="BP" />
     </ItemGroup>
 
     <ItemGroup>

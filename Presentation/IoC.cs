@@ -1,4 +1,4 @@
-using Environment = Common.BF.Enums.Environment;
+using Environment = Common.BP.Enums.Environment;
 
 namespace Presentation;
 
@@ -6,7 +6,7 @@ public static class Ioc
 {
     public static void AddDependencyGroup(this IServiceCollection services, Environment environment)
     {
-        BF.Ioc.AddDependencyGroup(services, environment);
+        BP.Ioc.AddDependencyGroup(services, environment);
         AddDomainServices(services, environment);
         AddApplicationServices(services, environment);
     }
