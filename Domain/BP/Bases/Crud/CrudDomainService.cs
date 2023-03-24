@@ -23,105 +23,104 @@ namespace Domain.BP.Bases.Crud;
         /// <summary>
         /// The unit of work instance. too long to explain. Ask google the role of this pattern.
         /// </summary>
-        protected readonly IUnitOfWork UnitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// Instantiate an new instance of the mapper.
         /// Not satisfied the way it is now, might change it to use static method instead of instance later.
         /// </summary>
-        protected readonly TMapper Mapper = new();
+        private readonly TMapper _mapper = new();
         
         /// <summary>
         /// Instantiate the repository of the corresponding entity.
         /// </summary>
-        protected IGenericRepository<TEntity> Repository;
+        private readonly IGenericRepository<TEntity> _repository;
 
         /// <summary>
         /// Create an instance of a generic crud domain service.
         /// </summary>
         /// <param name="logger">Logger instance.</param>
         /// <param name="unitOfWork">The instance of a <see cref="IUnitOfWork"/>.</param>
-        public CrudDomainService(ILogger<DomainService> logger, IUnitOfWork unitOfWork) : base(logger)
+        public CrudDomainService(ILogger<CrudDomainService<TEntity, TDto, TMapper>> logger, IUnitOfWork unitOfWork) : base(logger)
         {
-            this.UnitOfWork = unitOfWork;
-            this.Repository = this.UnitOfWork.GetRepository<TEntity>();
+            this._unitOfWork = unitOfWork;
+            this._repository = this._unitOfWork.GetRepository<TEntity>();
         }
 
 
         /// <inheritdoc/>
-        public virtual async Task<IEnumerable<TDto>> GetAsync(Expression<Func<TEntity, bool>>? filter = null,
+        public IEnumerable<TDto> Get(Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, string includeProperties = "")
         {
-            var results = await this.Repository.GetAsync(filter, orderBy, includeProperties);
-            var ret = results.Select(x => this.Mapper.EntityToDto(x)).ToList();
+            var results = this._repository.Get(filter, orderBy, includeProperties);
+            var ret = results.Select(x => this._mapper.EntityToDto(x)).ToList();
 
             return ret;
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<TDto>> GetAsNoTrackingAsync(Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, string includeProperties = "")
+        public IEnumerable<TDto> GetAsNoTracking(Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, string includeProperties = "")
         {
-            var results = await this.Repository.GetAsNoTrackingAsync(filter, orderBy, includeProperties);
-            var ret = results.Select(x => this.Mapper.EntityToDto(x)).ToList();
+            var results = this._repository.GetAsNoTracking(filter, orderBy, includeProperties);
+            var ret = results.Select(x => this._mapper.EntityToDto(x)).ToList();
             
             return ret;
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<TDto>> GetAllAsync()
+        public IEnumerable<TDto> GetAll()
         {
-            var results = await this.Repository.GetAsync();
-            return results.Select(x => this.Mapper.EntityToDto(x)).ToList();
+            var results = this._repository.Get();
+            return results.Select(x => this._mapper.EntityToDto(x)).ToList();
         }
 
         /// <inheritdoc/>
-        public async Task<TDto?> GetByIdAsync(int id)
+        public TDto GetById(int id)
         {
-            return this.Mapper.EntityToDto(await this.Repository.GetByIdAsync(id) ??
-                                           throw new InvalidOperationException());
+            return this._mapper.EntityToDto(this._repository.GetById(id));
         }
 
         /// <inheritdoc/>
         public TDto Insert(TDto dto)
         {
-            var entity = this.Mapper.DtoToEntity(dto);
+            var entity = this._mapper.DtoToEntity(dto);
             
-            this.Repository.Insert(entity);
-            this.UnitOfWork.Save();
-            Logger.LogInformation(" {TEntity} Id: {Id} inserted.", typeof(TEntity), dto.Id);
+            this._repository.Insert(entity);
+            this._unitOfWork.Save();
+            Logger.LogInformation(" {TEntity} Id: {Id} inserted", typeof(TEntity), dto.Id);
 
-            return this.Mapper.EntityToDto(entity);
+            return this._mapper.EntityToDto(entity);
         }
 
         /// <inheritdoc/>
         public void Delete(int id)
         {
-            this.Repository.Delete(id);
-            this.UnitOfWork.Save();
-            Logger.LogInformation(" {TEntity} Id: {Id} deleted.", typeof(TEntity), id);
+            this._repository.Delete(id);
+            this._unitOfWork.Save();
+            Logger.LogInformation(" {TEntity} Id: {Id} deleted", typeof(TEntity), id);
 
         }
 
         /// <inheritdoc/>
         public void Delete(TDto toDelete)
         {
-            var entity = this.Mapper.DtoToEntity(toDelete);
+            var entity = this._mapper.DtoToEntity(toDelete);
 
-            this.Repository.Delete(entity);
-            this.UnitOfWork.Save();
-            Logger.LogInformation(" {TEntity} Id: {Id} deleted.", typeof(TEntity), toDelete.Id);
+            this._repository.Delete(entity);
+            this._unitOfWork.Save();
+            Logger.LogInformation(" {TEntity} Id: {Id} deleted", typeof(TEntity), toDelete.Id);
 
         }
 
         /// <inheritdoc/>
         public TDto Update(TDto toUpdate)
         {
-            var entity = this.Mapper.DtoToEntity(toUpdate);
+            var entity = this._mapper.DtoToEntity(toUpdate);
             
-            this.Repository.Update(entity);
-            this.UnitOfWork.Save();
-            Logger.LogInformation(" {TEntity} Id: {Id} updated.", typeof(TEntity), toUpdate.Id);
+            this._repository.Update(entity);
+            this._unitOfWork.Save();
+            Logger.LogInformation(" {TEntity} Id: {Id} updated", typeof(TEntity), toUpdate.Id);
             
-            return this.Mapper.EntityToDto(entity);
+            return this._mapper.EntityToDto(entity);
         }
     }

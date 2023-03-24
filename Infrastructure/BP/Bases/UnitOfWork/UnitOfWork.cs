@@ -1,6 +1,5 @@
 using Infrastructure.BP.Bases.Entity;
 using Infrastructure.BP.Bases.GenericRepository;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.BP.Bases.UnitOfWork;
@@ -8,7 +7,7 @@ namespace Infrastructure.BP.Bases.UnitOfWork;
 using Migrations;
 
 /// <inheritdoc/>
-    public sealed class UnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         /// <summary>
         /// The context of the db.
@@ -53,16 +52,12 @@ using Migrations;
         public int Save()
         {
             var nbOfRows = this._context.SaveChanges();
-            foreach (var entry in this._context.ChangeTracker.Entries())
-            {
-                entry.State = EntityState.Detached;
-            }
-            this._logger.LogInformation("{count} rows affected.", nbOfRows);
+            this._logger.LogInformation("{Count} rows affected", nbOfRows);
             return nbOfRows;
         }
 
         /// <inheritdoc cref="IDisposable" />
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!this._disposed)
             {
@@ -72,13 +67,11 @@ using Migrations;
                 }
             }
             this._disposed = true;
-            this._logger.LogInformation("Unit of Work disposed.");
         }
 
-        /// <inheritdoc/>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -89,7 +82,7 @@ using Migrations;
             var type = typeof(TEntity);
             if (_repositories.TryGetValue(type, out object value)) return (IGenericRepository<TEntity>)value;
             
-            this._repositories[type] = new GenericRepository<TEntity>(this._context, this._loggerFactory.CreateLogger<TEntity>());
+            this._repositories[type] = new GenericRepository<TEntity>(this._context, this._loggerFactory.CreateLogger<GenericRepository<TEntity>>());
             this._logger.LogInformation("new Repository of {TEntity} created at {DT}", type, DateTime.UtcNow.ToLongTimeString());
 
             return (IGenericRepository<TEntity>)this._repositories[type];

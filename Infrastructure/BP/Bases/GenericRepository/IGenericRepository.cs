@@ -15,7 +15,7 @@ namespace Infrastructure.BP.Bases.GenericRepository;
         /// <param name="orderBy">How the object should be ordered.</param>
         /// <param name="includeProperties">What child properties should be included.</param>
         /// <returns>a <see cref="IEnumerable{TEntity}"/></returns>
-        public Task<IEnumerable<TEntity>> GetAsync(
+        public IEnumerable<TEntity> Get(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "");
@@ -27,7 +27,7 @@ namespace Infrastructure.BP.Bases.GenericRepository;
         /// <param name="orderBy">How the object should be ordered.</param>
         /// <param name="includeProperties">What child properties should be included.</param>
         /// <returns>a <see cref="IEnumerable{TEntity}"/></returns>
-        public Task<IEnumerable<TEntity>> GetAsNoTrackingAsync(
+        public IEnumerable<TEntity> GetAsNoTracking(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "");
@@ -37,7 +37,7 @@ namespace Infrastructure.BP.Bases.GenericRepository;
         /// </summary>
         /// <param name="id">The Id of the <see cref="TEntity"/>.</param>
         /// <returns>The <see cref="TEntity"/> found.</returns>
-        public Task<TEntity> GetByIdAsync(int id);
+        public TEntity GetById(int id);
 
         /// <summary>
         /// Insert a <see cref="TEntity"/> into db.

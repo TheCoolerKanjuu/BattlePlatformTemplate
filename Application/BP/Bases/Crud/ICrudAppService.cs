@@ -27,7 +27,7 @@ namespace Application.BP.Bases.Crud;
         /// <param name="orderBy">Linq function that expresses an order, applied to the return of the request.</param>
         /// <param name="includeProperties">string containing all properties.</param>
         /// <returns>A <see cref="IEnumerable{TDTO}"/>.</returns>
-        public Task<IEnumerable<TDto>> GetAsync(
+        public IEnumerable<TDto> Get(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "");
@@ -36,14 +36,14 @@ namespace Application.BP.Bases.Crud;
         /// Fetch all <see cref="TEntity"/>.
         /// </summary>
         /// <returns>A <see cref="IEnumerable{TDTO}"/>.</returns>
-        public Task<IEnumerable<TDto>> GetAllAsync();
+        public IEnumerable<TDto> GetAll();
 
         /// <summary>
         /// Fetch a <see cref="TEntity"/> of the specified Id.
         /// </summary>
         /// <param name="id">The Id of the <see cref="TEntity"/> needed.</param>
         /// <returns>A <see cref="TDto"/>.</returns>
-        public Task<TDto?> GetByIdAsync(int id);
+        public TDto GetById(int id);
 
         /// <summary>
         /// Insert a <see cref="TEntity"/> of the specified <see cref="TDto"/>.
