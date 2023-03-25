@@ -8,7 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.BP.Bases.Crud;
 
-    /// <inheritdoc cref="ICrudAppService{TEntity,TDto,TMapper}"/>
+using Common.BP.Response;
+
+/// <inheritdoc cref="ICrudAppService{TEntity,TDto,TMapper}"/>
     public class CrudAppService<TEntity, TDto, TMapper> : AppService, ICrudAppService<TEntity, TDto, TMapper> 
         where TEntity : BaseEntity 
         where TDto : BaseDto
@@ -30,44 +32,61 @@ namespace Application.BP.Bases.Crud;
         }
 
         /// <inheritdoc/>
-        public IEnumerable<TDto> Get(Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, string includeProperties = "")
+        public DtoListResponse<TDto> Get(Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, string includeProperties = "")
         {
-            return this._domainService.Get(filter, orderBy, includeProperties);
+            return new DtoListResponse<TDto>
+            {
+                Data = this._domainService.Get(filter, orderBy, includeProperties)
+            };
         }
 
         /// <inheritdoc/>
-        public IEnumerable<TDto> GetAll()
+        public DtoListResponse<TDto> GetAll()
         {
-            return this._domainService.GetAll();
+            return new DtoListResponse<TDto>
+            {
+                Data = this._domainService.GetAll()
+            };
         }
 
         /// <inheritdoc/>
-        public TDto GetById(int id)
+        public DtoResponse<TDto> GetById(int id)
         {
-            return this._domainService.GetById(id);
+            return new DtoResponse<TDto>
+            {
+                Data = this._domainService.GetById(id)
+            };
         }
 
         /// <inheritdoc/>
-        public TDto Insert(TDto dto)
+        public DtoResponse<TDto> Insert(TDto dto)
         {
-            return this._domainService.Insert(dto);
+            return new DtoResponse<TDto>
+            {
+                Data = this._domainService.Insert(dto)
+            };
         }
 
         /// <inheritdoc/>
-        public void Delete(int id)
+        public BaseResponse Delete(int id)
         {
             this._domainService.Delete(id);
+            return new BaseResponse();
         }
 
         /// <inheritdoc/>
-        public void Delete(TDto toDelete)
+        public BaseResponse Delete(TDto toDelete)
         {
             this._domainService.Delete(toDelete);
+            return new BaseResponse();
         }
 
         /// <inheritdoc/>
-        public TDto Update(TDto toUpdate)
+        public DtoResponse<TDto> Update(TDto toUpdate)
         {
-            return this._domainService.Update(toUpdate);
+            return new DtoResponse<TDto>
+            {
+                Data = this._domainService.Update(toUpdate)
+            };
         }
     }

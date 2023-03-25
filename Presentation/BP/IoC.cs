@@ -8,6 +8,7 @@ using Environment = Common.BP.Enums.Environment;
 
 namespace Presentation.BP;
 
+using Domain.BP.Bases.Caching;
 using StackExchange.Redis;
 
 public static class Ioc
@@ -36,6 +37,7 @@ public static class Ioc
     {
         services.AddScoped<IDomainService, DomainService>();
         services.AddScoped(typeof(ICrudDomainService<,,>), typeof(CrudDomainService<,,>));
+        services.AddScoped(typeof(IApiCachingDomainService<>), typeof(ApiCachingDomainService<>));
 
     }
 
