@@ -1,4 +1,4 @@
-namespace Common.BP.Exceptions;
+namespace Common.BP.Exceptions.Entity;
 
 public class EntityNotFoundException : Exception
 {

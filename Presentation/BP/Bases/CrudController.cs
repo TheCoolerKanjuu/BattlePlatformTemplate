@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.BP.Bases;
 
-    /// <summary>
+using Common.BP.Exceptions.Entity;
+
+/// <summary>
     /// Generic controller class.
     /// </summary>
     /// <typeparam name="TEntity">The entity to fetch.</typeparam>
@@ -22,7 +24,7 @@ namespace Presentation.BP.Bases;
         /// <summary>
         /// The Instance of the service responsible for the crud operations.
         /// </summary>
-        private readonly ICrudAppService<TEntity, TDto, TMapper> _crudAppService;
+        protected readonly ICrudAppService<TEntity, TDto, TMapper> CrudAppService;
 
         /// <summary>
         /// DI constructor.
@@ -31,7 +33,7 @@ namespace Presentation.BP.Bases;
         /// <param name="crudAppService">The crud service instance.</param>
         protected CrudController(ILogger<CrudController<TEntity, TDto, TMapper>> logger, ICrudAppService<TEntity, TDto, TMapper> crudAppService) : base(logger)
         {
-            this._crudAppService = crudAppService;
+            this.CrudAppService = crudAppService;
         }
         
         /// <summary>
@@ -42,7 +44,8 @@ namespace Presentation.BP.Bases;
         [ProducesResponseType(StatusCodes.Status200OK)]
         public virtual IActionResult GetAll()
         {
-            return this.Ok(this._crudAppService.GetAll());
+            this.Logger.LogInformation("[GET] /{Controller} hit at {DT}", typeof(TEntity), DateTime.UtcNow.ToLongTimeString());
+            return this.Ok(this.CrudAppService.GetAll());
         }
         
         /// <summary>
@@ -54,12 +57,13 @@ namespace Presentation.BP.Bases;
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-
         public virtual IActionResult GetById(int id)
         {
+            this.Logger.LogInformation("[GET] /{Controller}/{Id} hit at {DT}", typeof(TEntity), id, DateTime.UtcNow.ToLongTimeString());
+
             try
             {
-                return this.Ok(this._crudAppService.GetById(id));
+                return this.Ok(this.CrudAppService.GetById(id));
             }
             catch (EntityNotFoundException e)
             {
@@ -82,9 +86,11 @@ namespace Presentation.BP.Bases;
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public virtual IActionResult Insert(TDto dto)
         {
+            this.Logger.LogInformation("[POST] /{Controller} hit at {DT}", typeof(TEntity), DateTime.UtcNow.ToLongTimeString());
+
             try
             {
-                return this.Ok(this._crudAppService.Insert(dto));
+                return this.Ok(this.CrudAppService.Insert(dto));
             }
             catch (Exception e)
             {
@@ -104,9 +110,11 @@ namespace Presentation.BP.Bases;
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public virtual IActionResult Update(TDto dto)
         {
+            this.Logger.LogInformation("[POST] /{Controller}/update hit at {DT}", typeof(TEntity), DateTime.UtcNow.ToLongTimeString());
+
             try
             {
-                return this.Ok(this._crudAppService.Update(dto));
+                return this.Ok(this.CrudAppService.Update(dto));
             }
             catch (EntityNotFoundException e)
             {
@@ -121,17 +129,19 @@ namespace Presentation.BP.Bases;
         /// <summary>
         /// Delete an entity based on dto information.
         /// </summary>
-        /// <param name="dto">The information dto.</param>
+        /// <param name="id">The id of entity.</param>
         [Authorize]
-        [HttpPost("delete")]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public virtual IActionResult Delete(TDto dto)
+        public virtual IActionResult Delete(int id)
         {
+            this.Logger.LogInformation("[DELETE] /{Controller}/{Id} hit at {DT}", typeof(TEntity), id, DateTime.UtcNow.ToLongTimeString());
+
             try
             {
-                this._crudAppService.Delete(dto);
+                this.CrudAppService.Delete(id);
             }
             catch (EntityNotFoundException e)
             {

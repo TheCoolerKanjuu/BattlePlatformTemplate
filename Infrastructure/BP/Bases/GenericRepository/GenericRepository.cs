@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.BP.Bases.GenericRepository;
 
+using Common.BP.Exceptions.Entity;
 using Migrations;
 
 /// <inheritdoc/>

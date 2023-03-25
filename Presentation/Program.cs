@@ -12,6 +12,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSignalR();
+
 builder.Services.AddDbContext<DataContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("Context")));
 

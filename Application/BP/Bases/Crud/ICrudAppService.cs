@@ -6,7 +6,9 @@ using Infrastructure.BP.Bases.Entity;
 
 namespace Application.BP.Bases.Crud;
 
-    /// <summary>
+using Common.BP.Response;
+
+/// <summary>
     /// Generic crud service.
     /// You can either instantiate if you want to use a basic crud, or inherit it and override some / all of its methods to add custom behaviours.
     /// </summary>
@@ -27,7 +29,7 @@ namespace Application.BP.Bases.Crud;
         /// <param name="orderBy">Linq function that expresses an order, applied to the return of the request.</param>
         /// <param name="includeProperties">string containing all properties.</param>
         /// <returns>A <see cref="IEnumerable{TDTO}"/>.</returns>
-        public IEnumerable<TDto> Get(
+        public DtoListResponse<TDto> Get(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             string includeProperties = "");
@@ -36,40 +38,40 @@ namespace Application.BP.Bases.Crud;
         /// Fetch all <see cref="TEntity"/>.
         /// </summary>
         /// <returns>A <see cref="IEnumerable{TDTO}"/>.</returns>
-        public IEnumerable<TDto> GetAll();
+        public DtoListResponse<TDto> GetAll();
 
         /// <summary>
         /// Fetch a <see cref="TEntity"/> of the specified Id.
         /// </summary>
         /// <param name="id">The Id of the <see cref="TEntity"/> needed.</param>
         /// <returns>A <see cref="TDto"/>.</returns>
-        public TDto GetById(int id);
+        public DtoResponse<TDto> GetById(int id);
 
         /// <summary>
         /// Insert a <see cref="TEntity"/> of the specified <see cref="TDto"/>.
         /// </summary>
         /// <param name="dto">A <see cref="TDto"/> containing the data of the <see cref="TEntity"/> to be inserted.</param>
         /// <returns>An empty <see cref="Task"/>.</returns>
-        public TDto Insert(TDto dto);
+        public DtoResponse<TDto> Insert(TDto dto);
 
         /// <summary>
         /// Delete a <see cref="TEntity"/> of the specified Id.
         /// </summary>
         /// <param name="id">The Id of the <see cref="TEntity"/> to be deleted.</param>
         /// <returns>A <see cref="TDto"/>.</returns>
-        public void Delete(int id);
+        public BaseResponse Delete(int id);
 
         /// <summary>
         /// Delete a <see cref="TEntity"/> of the specified <see cref="TDto"/>.
         /// </summary>
         /// <param name="toDelete">A <see cref="TDto"/> containing the data of the <see cref="TEntity"/> to be deleted.</param>
         /// <returns>An empty <see cref="Task"/>.</returns>
-        public void Delete(TDto toDelete);
+        public BaseResponse Delete(TDto toDelete);
 
         /// <summary>
         /// Update a <see cref="TEntity"/> of with specified <see cref="TDto"/> information.
         /// </summary>
         /// <param name="toUpdate">A <see cref="TDto"/> containing the data of the <see cref="TEntity"/> to be updated.</param>
         /// <returns>An empty <see cref="Task"/>.</returns>
-        public TDto Update(TDto toUpdate);
+        public DtoResponse<TDto> Update(TDto toUpdate);
     }
