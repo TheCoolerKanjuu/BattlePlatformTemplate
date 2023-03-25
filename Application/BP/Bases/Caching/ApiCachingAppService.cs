@@ -26,38 +26,20 @@ public class ApiCachingAppService<TResponse> : AppService, IApiCachingAppService
     {
         this._cachingDomainService = cachingDomainService;
     }
-
-    /// <inheritdoc/>
-    public TResponse Cache(Func<TResponse> serviceMethod, string route, string userIdentifier = "")
-    {
-        var key = BuildKey(route, userIdentifier);
-        var res = this._cachingDomainService.Get(key);
-        if (res != null) return res;
-        var dbres = serviceMethod();
-        dbres.Source = "Database";
-        return dbres;
-
-    }
+    
     
     /// <inheritdoc/>
-    public TResponse Cache(Func<object, TResponse> serviceMethod, object param, string route, string userIdentifier = "")
+    public TResponse Cache(Delegate serviceMethod, string route, string userIdentifier,params object[] param)
     {
         var key = BuildKey(route, userIdentifier);
         var res = this._cachingDomainService.Get(key);
         if (res != null) return res;
-        var dbres = serviceMethod(param);
+        var dbres = (TResponse)serviceMethod.DynamicInvoke(param)!;
+        if (dbres == null) throw new InvalidOperationException();
+        
         dbres.Source = "Database";
         return dbres;
-    }
-    /// <inheritdoc/>
-    public TResponse Cache(Func<int, TResponse> serviceMethod, int param, string route, string userIdentifier = "")
-    {
-        var key = BuildKey(route, userIdentifier);
-        var res = this._cachingDomainService.Get(key);
-        if (res != null) return res;
-        var dbres = serviceMethod(param);
-        dbres.Source = "Database";
-        return dbres;
+
     }
 
     private static string BuildKey(string route, string userIdentifier)

@@ -31,15 +31,15 @@ public abstract class CachedCrudController<TEntity, TDto, TMapper> : CrudControl
 
         public override IActionResult GetAll()
         {
-                this.Logger.LogInformation("[GET] /{Controller} hit at {DT}", typeof(TEntity), DateTime.UtcNow.ToLongTimeString());
                 var route = $"/{typeof(TEntity)}";
-                return this.Ok(this._getAllCacheService.Cache(this.CrudAppService.GetAll,route));
+                this.Logger.LogInformation("[GET] /{Controller} hit at {DT}", typeof(TEntity), DateTime.UtcNow.ToLongTimeString());
+                return this.Ok(this._getAllCacheService.Cache(this.CrudAppService.GetAll,route, ""));
         }
 
         public override IActionResult GetById(int id)
         {
-                this.Logger.LogInformation("[GET] /{Controller} hit at {DT}", typeof(TEntity), DateTime.UtcNow.ToLongTimeString());
-                var route = $"/{typeof(TEntity)}";
-                return this.Ok(this._getByIdCacheService.Cache(this.CrudAppService.GetById, id, route));
+                var route = $"/{typeof(TEntity)}/{id}";
+                this.Logger.LogInformation("[GET] {Route} hit at {DT}", route, DateTime.UtcNow.ToLongTimeString());
+                return this.Ok(this._getByIdCacheService.Cache(this.CrudAppService.GetById, route, "", id));
         }
 }
