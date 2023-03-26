@@ -1,6 +1,6 @@
 ﻿namespace Common.BP.Bases;
 
-public abstract record BaseRequest
+public abstract class BaseRequest
 {
     
 }

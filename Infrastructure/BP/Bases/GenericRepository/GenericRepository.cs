@@ -53,6 +53,7 @@ using Migrations;
             query = includeProperties.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries).Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
             return orderBy != null ? orderBy(query).ToList() : query.ToList();
         }
+        
         /// <inheritdoc/>
         public IEnumerable<TEntity> GetAsNoTracking(
             Expression<Func<TEntity, bool>>? filter = null,
