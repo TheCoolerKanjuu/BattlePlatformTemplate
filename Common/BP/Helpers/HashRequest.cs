@@ -1,4 +1,4 @@
-﻿namespace Presentation.BP.Helpers;
+﻿namespace Common.BP.Helpers;
 
 public static class HashRequest
 {

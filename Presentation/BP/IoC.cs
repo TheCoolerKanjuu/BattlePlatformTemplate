@@ -13,7 +13,7 @@ using StackExchange.Redis;
 
 public static class Ioc
 {
-    public static void AddDependencyGroup(this IServiceCollection services, Environment environment, IConfiguration configuration)
+    public static void AddDependencyGroup(this IServiceCollection services, IWebHostEnvironment environment, IConfiguration configuration)
     {
         AddApplicationServices(services, environment);
         AddDomainServices(services, environment);
@@ -21,19 +21,19 @@ public static class Ioc
         AddPresentationServices(services, environment, configuration.GetSection("Redis:ConnexionURL").Value!);
     }
 
-    private static void AddInfraServices(IServiceCollection services, Environment environment)
+    private static void AddInfraServices(IServiceCollection services, IWebHostEnvironment environment)
     {
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
     }
 
-    private static void AddPresentationServices(IServiceCollection services, Environment environment, string redisConnectionUrl)
+    private static void AddPresentationServices(IServiceCollection services, IWebHostEnvironment environment, string redisConnectionUrl)
     {
         services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionUrl));
     }
 
-    private static void AddDomainServices(this IServiceCollection services, Environment environment)
+    private static void AddDomainServices(this IServiceCollection services, IWebHostEnvironment environment)
     {
         services.AddScoped<IDomainService, DomainService>();
         services.AddScoped(typeof(ICrudDomainService<,,>), typeof(CrudDomainService<,,>));
@@ -41,7 +41,7 @@ public static class Ioc
 
     }
 
-    private static void AddApplicationServices(this IServiceCollection services, Environment environment)
+    private static void AddApplicationServices(this IServiceCollection services, IWebHostEnvironment environment)
     {
         services.AddScoped<IAppService, AppService>();
         services.AddScoped(typeof(ICrudAppService<,,>), typeof(CrudAppService<,,>));

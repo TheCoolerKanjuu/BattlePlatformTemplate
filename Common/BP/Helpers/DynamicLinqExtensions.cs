@@ -1,4 +1,4 @@
-﻿namespace Presentation.BP.Helpers;
+﻿namespace Common.BP.Helpers;
 
 using System.Linq.Dynamic.Core;
 using System.Linq.Dynamic.Core.Exceptions;
