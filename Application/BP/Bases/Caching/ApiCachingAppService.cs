@@ -29,9 +29,8 @@ public class ApiCachingAppService<TResponse> : AppService, IApiCachingAppService
     
     
     /// <inheritdoc/>
-    public TResponse Cache(Delegate serviceMethod, string route, string userIdentifier,params object[] param)
+    public TResponse Cache(Delegate serviceMethod, string key, params object[] param)
     {
-        var key = BuildKey(route, userIdentifier);
         var res = this._cachingDomainService.Get(key);
         if (res != null) return res;
         var dbres = (TResponse)serviceMethod.DynamicInvoke(param)!;
@@ -39,11 +38,5 @@ public class ApiCachingAppService<TResponse> : AppService, IApiCachingAppService
         
         dbres.Source = "Database";
         return dbres;
-
-    }
-
-    private static string BuildKey(string route, string userIdentifier)
-    {
-        return $"route:{route}user:{userIdentifier}";
     }
 }

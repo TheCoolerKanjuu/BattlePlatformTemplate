@@ -1,7 +1,7 @@
+using Common.BP.Helpers;
 using Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Presentation;
-using Presentation.BP.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +17,7 @@ builder.Services.AddSignalR();
 builder.Services.AddDbContext<DataContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("Context")));
 
-builder.Services.AddDependencyGroup(EnvFinder.GetEnvironment(builder.Environment), builder.Configuration);
+builder.Services.AddDependencyGroup(builder.Environment, builder.Configuration);
 
 var app = builder.Build();
 

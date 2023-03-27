@@ -8,7 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.BP.Bases;
 
+using System.Linq.Dynamic.Core;
 using Common.BP.Exceptions.Entity;
+using Common.BP.Helpers;
+using Common.BP.Request;
 
 /// <summary>
     /// Generic controller class.
@@ -46,6 +49,21 @@ using Common.BP.Exceptions.Entity;
         {
             this.Logger.LogInformation("[GET] /{Controller} hit at {DT}", typeof(TEntity), DateTime.UtcNow.ToLongTimeString());
             return this.Ok(this.CrudAppService.GetAll());
+        }
+        
+        /// <summary>
+        /// Get all entities.
+        /// </summary>
+        /// <returns>All entities as <see cref="TDto"/>.</returns>
+        [HttpPost("get")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual IActionResult Get(LazyLoadRequest request)
+        {
+            this.Logger.LogInformation("[Post] /{Controller}/get hit at {DT}", typeof(TEntity), DateTime.UtcNow.ToLongTimeString());
+            return this.Ok(this.CrudAppService.Get(
+                filter: DynamicLinqExtensions.ParseFilterExpression<TEntity>(request.Filter),
+                orderBy: DynamicLinqExtensions.ParseOrderByExpression<TEntity>(request.OrderBy)
+                ));
         }
         
         /// <summary>
