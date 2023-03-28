@@ -4,12 +4,11 @@ using Domain.BP.Bases.Crud;
 using Domain.BP.Bases.Service;
 using Infrastructure.BP.Bases.GenericRepository;
 using Infrastructure.BP.Bases.UnitOfWork;
-using Environment = Common.BP.Enums.Environment;
+using Domain.BP.Bases.Caching;
+using StackExchange.Redis;
 
 namespace Presentation.BP;
 
-using Domain.BP.Bases.Caching;
-using StackExchange.Redis;
 
 public static class Ioc
 {

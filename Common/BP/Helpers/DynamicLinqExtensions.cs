@@ -8,15 +8,10 @@ public static class DynamicLinqExtensions
 {
     public static Expression<Func<TEntity, bool>>? ParseFilterExpression<TEntity>(string? filterExpression)
     {
-        if (string.IsNullOrEmpty(filterExpression))
-        {
-            return null;
-        }
-
+        if (string.IsNullOrEmpty(filterExpression)) return null;
         try
         {
             return DynamicExpressionParser.ParseLambda<TEntity, bool>(new ParsingConfig(), false, filterExpression);
-            
         }
         catch (ParseException ex)
         {
@@ -26,12 +21,12 @@ public static class DynamicLinqExtensions
 
     public static Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? ParseOrderByExpression<TEntity>(string? orderByExpression)
     {
-        if (string.IsNullOrEmpty(orderByExpression))
-            return null;
-
+        if (string.IsNullOrEmpty(orderByExpression)) return null;
         try
         {
-            return DynamicExpressionParser.ParseLambda<IQueryable<TEntity>, IOrderedQueryable<TEntity>>(new ParsingConfig(), false, $"OrderBy({orderByExpression})").Compile();
+            return DynamicExpressionParser
+                .ParseLambda<IQueryable<TEntity>, IOrderedQueryable<TEntity>>(new ParsingConfig(), false,
+                    $"OrderBy({orderByExpression})").Compile();
         }
         catch (ParseException ex)
         {

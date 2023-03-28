@@ -1,5 +1,3 @@
-using Environment = Common.BP.Enums.Environment;
-
 namespace Presentation;
 
 public static class Ioc
